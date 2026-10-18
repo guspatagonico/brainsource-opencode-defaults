@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Conventional Commits: <type>(<scope>): <subject>
+# Tipos: feat fix docs style refactor perf test build ci chore revert
+# Merge/Revert/fixup/squash se permiten sin validar.
+
+file="${1:-}"
+if [[ -z "$file" || ! -f "$file" ]]; then
+  echo "commit-msg: falta el archivo de mensaje" >&2
+  exit 1
+fi
+
+first="$(head -n1 "$file")"
+
+if [[ "$first" =~ ^(Merge |Revert |fixup! |squash! ) ]]; then
+  exit 0
+fi
+
+pattern='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-zA-Z0-9._/-]+\))?!?: .{1,72}$'
+
+if ! [[ "$first" =~ $pattern ]]; then
+  echo "" >&2
+  echo "commit-msg: Conventional Commits requerido." >&2
+  echo "  <type>(<scope>): <subject>" >&2
+  echo "  tipos: feat fix docs style refactor perf test build ci chore revert" >&2
+  echo "  ejemplo: feat(auth): add password reset" >&2
+  echo "  breaking: feat(api)!: remove legacy endpoint" >&2
+  echo "" >&2
+  exit 1
+fi

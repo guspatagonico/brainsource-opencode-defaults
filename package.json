@@ -1,0 +1,47 @@
+{
+  "name": "brainsource-opencode-defaults",
+  "version": "0.1.0",
+  "description": "Brainsource global defaults for OpenCode V2: rules, repo scaffolding, docs, worktrees, releases, and context budgeting.",
+  "type": "module",
+  "main": "./index.ts",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "files": [
+    "index.ts",
+    "src",
+    "skills",
+    "templates",
+    "rules.md",
+    "packages/context-budget",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "opencode",
+    "plugin",
+    "defaults",
+    "brainsource",
+    "conventional-commits",
+    "worktrees",
+    "semver"
+  ],
+  "license": "MIT",
+  "author": "Gustavo Salvini",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guspatagonico/brainsource-opencode-defaults.git"
+  },
+  "packageManager": "pnpm@11.4.0",
+  "dependencies": {
+    "@opencode/plugin": "^2.0.32"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.6.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test:scaffold": "node --experimental-strip-types scripts/test-scaffold.ts"
+  }
+}
