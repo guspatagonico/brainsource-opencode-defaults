@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SemVer Release Automation — Analyze changes since last tag and output SemVer recommendation
-# Author: Gustavo Adrián Salvini <gsalvini@ecimtech.com>
+# Author: Gustavo Adrián Salvini <guspatagonico@gmail.com> — @guspatagonico
 #         https://github.com/guspatagonico — @guspatagonico
 # Usage: ./release-semver.sh [--json] [--apply] [--github] [--title "vX.Y.Z"]
 # Output: SemVer recommendation, release notes, optional GitHub Release creation

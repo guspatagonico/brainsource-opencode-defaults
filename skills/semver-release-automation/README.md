@@ -146,7 +146,7 @@ git push --follow-tags
 
 ## Autor
 
-Gustavo Adrián Salvini — [gsalvini@ecimtech.com](mailto:gsalvini@ecimtech.com) — [github.com/guspatagonico](https://github.com/guspatagonico) — [@guspatagonico](https://github.com/guspatagonico)
+Gustavo Adrián Salvini — [guspatagonico@gmail.com](mailto:guspatagonico@gmail.com) — [github.com/guspatagonico](https://github.com/guspatagonico) — [@guspatagonico](https://github.com/guspatagonico)
 
 ## Licencia
 

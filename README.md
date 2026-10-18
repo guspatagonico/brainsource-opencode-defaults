@@ -1,5 +1,8 @@
 # brainsource-opencode-defaults
 
+> **Repositorio oficial:** https://github.com/guspatagonico/brainsource-opencode-defaults
+> Instalá siempre desde este repo y fijá un tag/commit. Los forks no son oficiales.
+
 Defaults globales de Brainsource para **OpenCode V2**: reglas de equipo, scaffolding
 de repos, documentación, worktrees, releases SemVer y context budgeting — todo en un
 plugin que se instala una vez y se comparte desde GitHub.
@@ -44,6 +47,9 @@ agregarla o corregirla **proactivamente** cuando falte o esté desactualizada.
   scaffoldea un workflow genérico porque el stack varía por proyecto.
 
 ## Instalación
+
+El **repo oficial** es `github:guspatagonico/brainsource-opencode-defaults`. Instalá
+desde ahí y fijá un tag o commit; no uses forks.
 
 ```bash
 opencode plugin add github:guspatagonico/brainsource-opencode-defaults#main

@@ -1,6 +1,6 @@
 ---
 name: semver-release-automation
-author: Gustavo Adrián Salvini <gsalvini@ecimtech.com> (https://github.com/guspatagonico - @guspatagonico)
+author: Gustavo Adrián Salvini <guspatagonico@gmail.com> (https://github.com/guspatagonico - @guspatagonico)
 description: |
   Automates semantic releases from the previous git tag. Trigger when user asks to bump version, decide patch/minor/major from changes since last tag, create release commit+tag, generate full changelog/release notes, or create GitHub Release with auto-generated notes. Keywords: "subir versión", "bump", "release", "semver", "último tag", "changelog", "release notes", "commit + tag", "github release". Default dry-run. Confirm only for major. Push is manual by default with optional push dry-run/apply modes. Optional `--github` flag creates a GitHub Release with detailed release notes.
   Examples: "prepará release semver", "decidí semver según cambios", "creá commit y tag de release", "subí versión según cambios desde último tag", "generar changelog completo", "aplicá release con github release".
