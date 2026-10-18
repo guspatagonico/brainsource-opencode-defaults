@@ -141,7 +141,13 @@ export async function registerTools(ctx: any, options: Record<string, any>): Pro
         ]
         if (!spec.local && input.protectMain !== false) {
           try {
-            protectMain({ repo: result.fullName, approvals: 1, apply: true, baseDir: spec.target })
+            protectMain({
+              repo: result.fullName,
+              approvals: 1,
+              enforceAdmins: false,
+              apply: true,
+              baseDir: spec.target,
+            })
             details.push("  branch protection: main (PR-only, squash-only, 1 approval)")
           } catch (error) {
             const message = error instanceof Error ? error.message : String(error)
