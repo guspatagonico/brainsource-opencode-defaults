@@ -8,14 +8,15 @@ plugin que se instala una vez y se comparte desde GitHub.
 
 - **Reglas globales** inyectadas en cada request con el hook `context`
   (`rules.md`).
-- **Skills**: `new-repo`, `project-docs`, `semver-release-automation`.
+- **Skills**: `new-repo`, `project-docs`, `semver-release-automation`, `pull-request`.
 - **Commands**: `/new-repo`, `/release`, `/docs-sync`, `/worktree`, `/install-hooks`,
-  `/repo-about`.
+  `/repo-about`, `/pr`.
 - **Tools**:
   - `brainsource_new_repo`
   - `brainsource_install_commit_hook`
   - `brainsource_worktree_create`
   - `brainsource_set_repo_about`
+  - `brainsource_protect_main`
 - **Context budget** (subpaquete `packages/context-budget`): resumen híbrido de
   compactación + compactación proactiva + log de calibración.
 - **Templates**: `.gitignore`, `README.md`, `AGENTS.md`, `ARCHITECTURE.md`,
@@ -27,6 +28,20 @@ Todo repo creado o adoptado debe tener una **descripción breve** en el About de
 `brainsource_new_repo` la exige (≤160 chars recomendados) y `brainsource_set_repo_about`
 la actualiza en repos existentes. La regla inyectada también le indica al agente
 agregarla o corregirla **proactivamente** cuando falte o esté desactualizada.
+
+## Pull Requests y merge
+
+- `main` solo se actualiza por **PR**; nunca push directo.
+- **Squash-only**: el título del PR es el commit en `main` y el body del PR es el body
+  del commit.
+- PR notes obligatorias con `.github/pull_request_template.md`.
+- Co-autores: el autor del PR es el autor principal; los demás van como
+  `Co-authored-by` en el body. La skill `/pr` los genera desde los commits de la branch.
+- `brainsource_protect_main` configura PR obligatorio, 1 aprobación, linear history,
+  sin force push ni borrado, y squash-only con PR title/body.
+- `new_repo` aplica esa protección por defecto (`protectMain: true`).
+- CI: los checks requeridos se configuran en branch protection cuando exista CI. No se
+  scaffoldea un workflow genérico porque el stack varía por proyecto.
 
 ## Instalación
 
@@ -109,6 +124,7 @@ Son mecanismos independientes: el plugin no puede cambiar la config de OpenCode.
 /worktree mi-feature
 /install-hooks
 /repo-about
+/pr
 ```
 
 `/new-repo` hace dry-run primero y pide confirmación. El tool

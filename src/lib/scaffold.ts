@@ -50,7 +50,7 @@ export function fullNameOf(spec: Pick<RepoSpec, "name" | "owner">): string {
 
 export function planRepo(spec: RepoSpec): RepoPlan {
   const fullName = fullNameOf(spec)
-  const files = [".gitignore", "README.md", "AGENTS.md", "ARCHITECTURE.md", "docs/README.md"]
+  const files = [".gitignore", "README.md", "AGENTS.md", "ARCHITECTURE.md", "docs/README.md", ".github/pull_request_template.md"]
   if (spec.license === "MIT") files.push("LICENSE")
   files.push(".git/hooks/commit-msg")
 
@@ -117,6 +117,11 @@ export function scaffoldRepo(spec: RepoSpec): RepoPlan {
   writeFileSync(
     join(spec.target, "docs", "README.md"),
     render(readFileSync(join(spec.templatesDir, "docs", "README.md"), "utf8"), vars),
+  )
+  mkdirSync(join(spec.target, ".github"), { recursive: true })
+  copyFileSync(
+    join(spec.templatesDir, "PULL_REQUEST_TEMPLATE.md"),
+    join(spec.target, ".github", "pull_request_template.md"),
   )
 
   if (spec.license === "MIT") {

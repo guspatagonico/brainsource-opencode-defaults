@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url"
 import { planRepo, scaffoldRepo, type RepoSpec } from "../src/lib/scaffold.ts"
 import { createWorktree } from "../src/lib/worktree.ts"
 import { buildAboutArgs } from "../src/lib/about.ts"
+import { buildProtectionPayload, buildRepoSettings } from "../src/lib/protection.ts"
 
 const here = dirname(fileURLToPath(import.meta.url))
 const templatesDir = join(here, "..", "templates")
@@ -38,12 +39,17 @@ try {
     "AGENTS.md",
     "ARCHITECTURE.md",
     "docs/README.md",
+    ".github/pull_request_template.md",
     "LICENSE",
     ".git/hooks/commit-msg",
   ]
   for (const file of files) {
     if (!existsSync(join(target, file))) throw new Error(`falta ${file}`)
   }
+
+  const prTemplate = readFileSync(join(target, ".github/pull_request_template.md"), "utf8")
+  if (!prTemplate.includes("## Co-autores")) throw new Error("PR template sin Co-autores")
+  if (!prTemplate.includes("Co-authored-by")) throw new Error("PR template sin Co-authored-by")
 
   const readme = readFileSync(join(target, "README.md"), "utf8")
   if (!readme.includes("demo-repo")) throw new Error("README sin nombre del proyecto")
@@ -106,10 +112,33 @@ try {
     if (!aboutArgs.includes(expected)) throw new Error(`aboutArgs sin ${expected}`)
   }
 
+  const payload = buildProtectionPayload({ approvals: 1 })
+  const reviews = payload.required_pull_request_reviews as {
+    required_approving_review_count: number
+  }
+  if (reviews.required_approving_review_count !== 1) {
+    throw new Error("protection payload sin 1 approval")
+  }
+  if (payload.allow_force_pushes !== false || payload.allow_deletions !== false) {
+    throw new Error("protection payload permite force push o borrado")
+  }
+
+  const settings = buildRepoSettings()
+  if (settings.allow_merge_commit !== false || settings.allow_rebase_merge !== false) {
+    throw new Error("repo settings no es squash-only")
+  }
+  if (
+    settings.squash_merge_commit_title !== "PR_TITLE" ||
+    settings.squash_merge_commit_message !== "PR_BODY"
+  ) {
+    throw new Error("repo settings no usa PR title/body")
+  }
+
   console.log("OK scaffold:", target)
   console.log("OK worktree:", worktree.directory, "->", worktree.branch)
   console.log("OK no-license:", noLicenseTarget)
   console.log("OK about args")
+  console.log("OK protection")
   console.log(log.stdout.trim())
 } finally {
   rmSync(root, { recursive: true, force: true })

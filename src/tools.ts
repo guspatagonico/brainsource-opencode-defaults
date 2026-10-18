@@ -4,6 +4,7 @@ import { planRepo, scaffoldRepo, type RepoSpec } from "./lib/scaffold"
 import { createWorktree } from "./lib/worktree"
 import { installCommitHook } from "./lib/hooks"
 import { setRepoAbout } from "./lib/about"
+import { protectMain } from "./lib/protection"
 
 function formatPlan(plan: ReturnType<typeof planRepo>, spec: RepoSpec): string {
   const lines = [
@@ -67,6 +68,11 @@ export async function registerTools(ctx: any, options: Record<string, any>): Pro
             type: "boolean",
             description: "Scaffold locally only, without creating the GitHub repo.",
           },
+          protectMain: {
+            type: "boolean",
+            description:
+              "Protect main after creating the repo (PR-only, squash-only, 1 approval). Default true.",
+          },
           apply: {
             type: "boolean",
             description: "Execute. Default false (dry-run).",
@@ -107,7 +113,11 @@ export async function registerTools(ctx: any, options: Record<string, any>): Pro
 
         const plan = planRepo(spec)
         if (input.apply !== true) {
-          return { content: formatPlan(plan, spec) }
+          const protection =
+            spec.local || input.protectMain === false
+              ? "no"
+              : "sí (PR-only, squash-only, 1 approval)"
+          return { content: `${formatPlan(plan, spec)}\n  protección main: ${protection}` }
         }
 
         if (!spec.local) {
@@ -129,6 +139,15 @@ export async function registerTools(ctx: any, options: Record<string, any>): Pro
           `  commit:      chore: initial commit`,
           spec.local ? "  remoto:      (local, sin GitHub)" : `  remoto:      ${result.fullName}`,
         ]
+        if (!spec.local && input.protectMain !== false) {
+          try {
+            protectMain({ repo: result.fullName, approvals: 1, apply: true, baseDir: spec.target })
+            details.push("  branch protection: main (PR-only, squash-only, 1 approval)")
+          } catch (error) {
+            const message = error instanceof Error ? error.message : String(error)
+            details.push(`  ⚠ branch protection no aplicada: ${message}`)
+          }
+        }
         if (result.warnings.length) {
           details.push("", "Advertencias:", ...result.warnings.map((warning) => `- ${warning}`))
         }
@@ -241,6 +260,75 @@ export async function registerTools(ctx: any, options: Record<string, any>): Pro
             `✔ About actualizado en ${result.repo}`,
             `  descripción: ${result.description}`,
             ...extras,
+          ].join("\n"),
+        }
+      },
+    })
+
+    editor.add({
+      name: "brainsource_protect_main",
+      description:
+        "Configure main for PR-only merges: required PR + approvals, dismiss stale reviews, linear history, no force pushes/deletions, and squash-only merges with PR title/body. Dry-run by default; apply=true to execute.",
+      input: {
+        type: "object",
+        properties: {
+          repo: { type: "string", description: "owner/name. Default: current repo." },
+          approvals: {
+            type: "integer",
+            minimum: 1,
+            description: "Required approving reviews. Default 1.",
+          },
+          checks: {
+            type: "array",
+            items: { type: "string" },
+            description: "Required status check names (optional).",
+          },
+          enforceAdmins: {
+            type: "boolean",
+            description: "Apply protection to admins too. Default true.",
+          },
+          apply: {
+            type: "boolean",
+            description: "Execute. Default false (dry-run).",
+          },
+        },
+        additionalProperties: false,
+      },
+      execute: async (input: any) => {
+        const plan = protectMain({
+          repo: input.repo,
+          approvals: input.approvals,
+          checks: input.checks,
+          enforceAdmins: input.enforceAdmins,
+          apply: input.apply === true,
+          baseDir,
+        })
+
+        if (input.apply !== true) {
+          return {
+            content: [
+              "Plan (dry-run) — no se cambió nada",
+              `  repo: ${plan.repo}`,
+              `  endpoint: PUT ${plan.endpoint}`,
+              "  payload:",
+              JSON.stringify(plan.payload, null, 2),
+              "  repo settings:",
+              JSON.stringify(plan.repoSettings, null, 2),
+              "",
+              "Aplicá con apply: true.",
+            ].join("\n"),
+          }
+        }
+
+        const reviews = plan.payload.required_pull_request_reviews as {
+          required_approving_review_count: number
+        }
+        return {
+          content: [
+            `✔ main protegida en ${plan.repo}`,
+            `  PR obligatorio, ${reviews.required_approving_review_count} aprobación(es)`,
+            "  squash-only (PR title + body)",
+            "  sin force push ni borrado; linear history",
           ].join("\n"),
         }
       },

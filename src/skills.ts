@@ -27,6 +27,12 @@ const SKILLS: SkillMeta[] = [
     description:
       "Automate SemVer releases from the previous git tag: decide patch/minor/major, bump, changelog, tag, push, and GitHub Release.",
   },
+  {
+    id: "pull-request",
+    name: "Pull Request",
+    description:
+      "Prepare detailed PR notes and create or update a GitHub Pull Request using the Brainsource template, including co-authors for squash merges.",
+  },
 ]
 
 /** Drop the YAML frontmatter; the skill body is what gets injected on load. */

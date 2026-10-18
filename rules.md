@@ -48,6 +48,33 @@ puede agregar o especializar; si hay conflicto, gana el del proyecto.
 - Operaciones destructivas (force push, reescritura de historia, `rm -rf`, deploy a
   producción): pedir confirmación explícita.
 
+## Pull Requests y merge a main
+
+- `main` solo se actualiza por **Pull Request**. Nunca push directo.
+- Un PR = un cambio lógico y acotado. Si crece, partilo.
+- Título del PR en **Conventional Commits**: `<type>(<scope>): <subject>`.
+- PR notes **obligatorias** con `.github/pull_request_template.md`: resumen,
+  contexto/motivación, cambios, cómo probar, evidencia, impacto/riesgos, co-autores,
+  issues, notas para el reviewer y checklist.
+- **Squash merge** por defecto: el título del PR es el commit en `main` y el body del
+  PR es el body del commit.
+- **Co-autores**: el autor del PR es el autor principal del squash; el resto de los
+  autores de los commits de la branch van como `Co-authored-by: Nombre <email>` en el
+  body, para reconocer su trabajo.
+- Al menos **1 aprobación**; el autor no mergea su propio PR.
+- **CI verde** antes del merge. Sin checks rojos.
+- Sin force push ni borrado de `main`; require linear history.
+- Borrar la branch después del merge.
+- Si el repo no tiene branch protection, aplicar `brainsource_protect_main`.
+
+## CI/CD
+
+- CI corre en cada PR y en `main`.
+- Checks mínimos: typecheck, lint, tests y build (según el stack).
+- Deploy solo desde `main` o tags `vX.Y.Z`; nunca desde feature branches.
+- Secrets en GitHub Secrets, nunca en el repo.
+- Los checks requeridos se configuran en branch protection cuando exista CI.
+
 ## Releases (SemVer)
 
 - Usar la skill `semver-release-automation` (o `/release`).
@@ -82,8 +109,9 @@ skill `project-docs` (o `/docs-sync`).
 - `brainsource_install_commit_hook` — instala el hook de Conventional Commits.
 - `brainsource_worktree_create` — crea el worktree de una feature.
 - `brainsource_set_repo_about` — crea/actualiza la descripción del About en GitHub.
+- `brainsource_protect_main` — branch protection PR-only + squash-only en `main`.
 - Atajos: `/new-repo`, `/release`, `/docs-sync`, `/worktree`, `/install-hooks`,
-  `/repo-about`.
+  `/repo-about`, `/pr`.
 
 ## Seguridad
 

@@ -62,6 +62,15 @@ const COMMANDS: CommandSpec[] = [
       "Incluí topics relevantes si faltan.",
     ].join("\n"),
   },
+  {
+    name: "pr",
+    description: "Preparar PR notes y crear/actualizar el PR",
+    template: [
+      "Cargá la skill `pull-request` y prepará el PR de la branch actual contra `main`.",
+      "Generá las PR notes con la plantilla, incluí los co-autores (`Co-authored-by`) de todos los commits de la branch y mostrámelas antes de crear nada.",
+      "Título en Conventional Commits. No mergees sin aprobación; si falta branch protection, sugerí `brainsource_protect_main`.",
+    ].join("\n"),
+  },
 ]
 
 export async function registerCommands(ctx: any): Promise<void> {

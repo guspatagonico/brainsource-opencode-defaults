@@ -1,6 +1,6 @@
 {
   "name": "brainsource-opencode-defaults",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Brainsource global defaults for OpenCode V2: rules, repo scaffolding, docs, worktrees, releases, and context budgeting.",
   "type": "module",
   "main": "./index.ts",
