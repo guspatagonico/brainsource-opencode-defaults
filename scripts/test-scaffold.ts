@@ -122,6 +122,9 @@ try {
   if (payload.allow_force_pushes !== false || payload.allow_deletions !== false) {
     throw new Error("protection payload permite force push o borrado")
   }
+  if (payload.required_linear_history !== true) {
+    throw new Error("protection payload sin linear history")
+  }
 
   const settings = buildRepoSettings()
   if (settings.allow_merge_commit !== false || settings.allow_rebase_merge !== false) {
