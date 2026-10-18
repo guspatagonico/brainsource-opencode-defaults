@@ -3,12 +3,14 @@ import { ROOT } from "./paths"
 import { planRepo, scaffoldRepo, type RepoSpec } from "./lib/scaffold"
 import { createWorktree } from "./lib/worktree"
 import { installCommitHook } from "./lib/hooks"
+import { setRepoAbout } from "./lib/about"
 
 function formatPlan(plan: ReturnType<typeof planRepo>, spec: RepoSpec): string {
   const lines = [
     "Plan (dry-run) — todavía no se creó nada",
     `  repo:     ${plan.fullName} (${spec.visibility})`,
     `  destino:  ${plan.target}`,
+    `  descripción: ${spec.description || "(falta)"}`,
     `  licencia: ${spec.license}`,
     `  archivos: ${plan.files.join(" ")}`,
     "  comandos:",
@@ -34,7 +36,7 @@ export async function registerTools(ctx: any, options: Record<string, any>): Pro
     editor.add({
       name: "brainsource_new_repo",
       description:
-        "Create a GitHub repository with private-by-default visibility, MIT license, a safe .gitignore, docs scaffolding, and a Conventional Commits hook. Dry-run by default; set apply=true to execute.",
+        "Create a GitHub repository with a required brief About description, private-by-default visibility, MIT license, a safe .gitignore, docs scaffolding, and a Conventional Commits hook. Dry-run by default; set apply=true to execute.",
       input: {
         type: "object",
         properties: {
@@ -43,7 +45,11 @@ export async function registerTools(ctx: any, options: Record<string, any>): Pro
             type: "boolean",
             description: "Create a public repo. Default false (private).",
           },
-          description: { type: "string", description: "Short repo description." },
+          description: {
+            type: "string",
+            description:
+              "Brief About description (<=160 chars recommended, max 350). Required.",
+          },
           owner: {
             type: "string",
             description: "GitHub user or org. Default: authenticated account.",
@@ -66,10 +72,17 @@ export async function registerTools(ctx: any, options: Record<string, any>): Pro
             description: "Execute. Default false (dry-run).",
           },
         },
-        required: ["name"],
+        required: ["name", "description"],
         additionalProperties: false,
       },
       execute: async (input: any, context: any) => {
+        const description = String(input.description ?? "").trim()
+        if (!description) {
+          throw new Error(
+            "Falta una descripción breve para el About de GitHub. Proponé una (<=160 chars) y confirmala.",
+          )
+        }
+
         if (!/^[a-z0-9][a-z0-9._-]*$/.test(String(input.name ?? ""))) {
           throw new Error("Nombre inválido. Usá minúsculas, números, '.', '_' o '-'.")
         }
@@ -84,7 +97,7 @@ export async function registerTools(ctx: any, options: Record<string, any>): Pro
           name: input.name,
           target,
           visibility: input.public === true ? "public" : "private",
-          description: input.description || input.name,
+          description,
           owner: input.owner || undefined,
           license: input.license === "none" ? "none" : "MIT",
           local: input.local === true,
@@ -184,6 +197,50 @@ export async function registerTools(ctx: any, options: Record<string, any>): Pro
             `✔ Worktree creado en ${result.directory}`,
             `  rama: ${result.branch} (${result.createdBranch ? "nueva" : "existente"})`,
             `  repo: ${result.repoRoot}`,
+          ].join("\n"),
+        }
+      },
+    })
+
+    editor.add({
+      name: "brainsource_set_repo_about",
+      description:
+        "Set or update the GitHub repository About description (and optional topics/homepage). Use it when a repo has no description or it is stale. Detects the current repo when repo is omitted.",
+      input: {
+        type: "object",
+        properties: {
+          description: {
+            type: "string",
+            description: "Brief About description (<=160 chars recommended, max 350).",
+          },
+          repo: { type: "string", description: "owner/name. Default: current repo." },
+          topics: {
+            type: "array",
+            items: { type: "string" },
+            description: "Topics to add.",
+          },
+          homepage: { type: "string", description: "Homepage URL." },
+        },
+        required: ["description"],
+        additionalProperties: false,
+      },
+      execute: async (input: any) => {
+        const result = setRepoAbout({
+          description: input.description,
+          repo: input.repo,
+          topics: input.topics,
+          homepage: input.homepage,
+          baseDir,
+        })
+        const extras = [
+          result.topics.length ? `  topics: ${result.topics.join(", ")}` : "",
+          result.homepage ? `  homepage: ${result.homepage}` : "",
+        ].filter(Boolean)
+        return {
+          content: [
+            `✔ About actualizado en ${result.repo}`,
+            `  descripción: ${result.description}`,
+            ...extras,
           ].join("\n"),
         }
       },

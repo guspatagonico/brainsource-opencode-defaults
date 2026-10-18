@@ -67,12 +67,24 @@ export function planRepo(spec: RepoSpec): RepoPlan {
 
   const warnings: string[] = []
   if (existsSync(spec.target)) warnings.push(`El destino ya existe: ${spec.target}`)
+  if (!spec.description.trim()) {
+    warnings.push("Falta una descripción breve para el About de GitHub.")
+  } else if (spec.description.length > 160) {
+    warnings.push("La descripción supera 160 chars; considerá acortarla para el About.")
+  }
 
   return { fullName, target: spec.target, files, commands, warnings }
 }
 
 export function scaffoldRepo(spec: RepoSpec): RepoPlan {
   const plan = planRepo(spec)
+  const description = spec.description.trim()
+  if (!description) {
+    throw new Error("Falta una descripción breve para el About de GitHub.")
+  }
+  if (description.length > 350) {
+    throw new Error("La descripción del About no puede superar 350 caracteres.")
+  }
   if (existsSync(spec.target)) throw new Error(`Ya existe el destino: ${spec.target}`)
 
   const email = run("git", ["config", "user.email"], spec.baseDir, { allowFail: true })
@@ -147,7 +159,7 @@ export function scaffoldRepo(spec: RepoSpec): RepoPlan {
         "--remote=origin",
         "--push",
         "--description",
-        spec.description || spec.name,
+        description,
       ],
       spec.target,
     )

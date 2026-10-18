@@ -16,6 +16,16 @@ puede agregar o especializar; si hay conflicto, gana el del proyecto.
 - Usar `gh` (cuenta autenticada) con visibilidad explícita; nunca el default
   interactivo.
 
+### About del repo
+
+- Todo repo debe tener una **descripción breve** en el About de GitHub (≤160 chars).
+- Al crear un repo es **obligatoria**: si el usuario no la da, proponela a partir del
+  propósito/README y confirmala.
+- Si un repo existente no tiene descripción o está desactualizada, agregala/actualizala
+  **proactivamente** con `brainsource_set_repo_about` (o `gh repo edit`), sin esperar a
+  que el usuario lo pida.
+- Mantené también topics relevantes.
+
 ## Git y worktrees
 
 - Trabajar features en **git worktrees**, no cambiando la rama del checkout principal.
@@ -71,7 +81,9 @@ skill `project-docs` (o `/docs-sync`).
   defecto, `apply: true` para ejecutar).
 - `brainsource_install_commit_hook` — instala el hook de Conventional Commits.
 - `brainsource_worktree_create` — crea el worktree de una feature.
-- Atajos: `/new-repo`, `/release`, `/docs-sync`, `/worktree`, `/install-hooks`.
+- `brainsource_set_repo_about` — crea/actualiza la descripción del About en GitHub.
+- Atajos: `/new-repo`, `/release`, `/docs-sync`, `/worktree`, `/install-hooks`,
+  `/repo-about`.
 
 ## Seguridad
 

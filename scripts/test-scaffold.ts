@@ -5,6 +5,7 @@ import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
 import { planRepo, scaffoldRepo, type RepoSpec } from "../src/lib/scaffold.ts"
 import { createWorktree } from "../src/lib/worktree.ts"
+import { buildAboutArgs } from "../src/lib/about.ts"
 
 const here = dirname(fileURLToPath(import.meta.url))
 const templatesDir = join(here, "..", "templates")
@@ -80,9 +81,35 @@ try {
     throw new Error("README sin licencia no debería tener sección Licencia")
   }
 
+  const emptyPlan = planRepo({ ...spec, description: "", target: join(root, "empty-plan") })
+  if (!emptyPlan.warnings.some((warning) => warning.toLowerCase().includes("descripción"))) {
+    throw new Error("el plan sin descripción debería advertirlo")
+  }
+
+  let emptyThrew = false
+  try {
+    scaffoldRepo({ ...spec, description: "", target: join(root, "empty-desc") })
+  } catch {
+    emptyThrew = true
+  }
+  if (!emptyThrew) throw new Error("scaffoldRepo debería fallar sin descripción")
+  if (existsSync(join(root, "empty-desc"))) {
+    throw new Error("no debería crear el destino sin descripción")
+  }
+
+  const aboutArgs = buildAboutArgs("owner/repo", {
+    description: "Demo",
+    topics: ["opencode", "semver"],
+    homepage: "https://example.com",
+  })
+  for (const expected of ["--description", "owner/repo", "--add-topic", "--homepage"]) {
+    if (!aboutArgs.includes(expected)) throw new Error(`aboutArgs sin ${expected}`)
+  }
+
   console.log("OK scaffold:", target)
   console.log("OK worktree:", worktree.directory, "->", worktree.branch)
   console.log("OK no-license:", noLicenseTarget)
+  console.log("OK about args")
   console.log(log.stdout.trim())
 } finally {
   rmSync(root, { recursive: true, force: true })

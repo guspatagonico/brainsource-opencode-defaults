@@ -9,15 +9,24 @@ plugin que se instala una vez y se comparte desde GitHub.
 - **Reglas globales** inyectadas en cada request con el hook `context`
   (`rules.md`).
 - **Skills**: `new-repo`, `project-docs`, `semver-release-automation`.
-- **Commands**: `/new-repo`, `/release`, `/docs-sync`, `/worktree`, `/install-hooks`.
+- **Commands**: `/new-repo`, `/release`, `/docs-sync`, `/worktree`, `/install-hooks`,
+  `/repo-about`.
 - **Tools**:
   - `brainsource_new_repo`
   - `brainsource_install_commit_hook`
   - `brainsource_worktree_create`
+  - `brainsource_set_repo_about`
 - **Context budget** (subpaquete `packages/context-budget`): resumen híbrido de
   compactación + compactación proactiva + log de calibración.
 - **Templates**: `.gitignore`, `README.md`, `AGENTS.md`, `ARCHITECTURE.md`,
   `docs/README.md`, `LICENSE-MIT`, hook `commit-msg`.
+
+## GitHub About
+
+Todo repo creado o adoptado debe tener una **descripción breve** en el About de GitHub.
+`brainsource_new_repo` la exige (≤160 chars recomendados) y `brainsource_set_repo_about`
+la actualiza en repos existentes. La regla inyectada también le indica al agente
+agregarla o corregirla **proactivamente** cuando falte o esté desactualizada.
 
 ## Instalación
 
@@ -99,11 +108,13 @@ Son mecanismos independientes: el plugin no puede cambiar la config de OpenCode.
 /docs-sync
 /worktree mi-feature
 /install-hooks
+/repo-about
 ```
 
 `/new-repo` hace dry-run primero y pide confirmación. El tool
-`brainsource_new_repo` crea el repo privado por defecto, con MIT, `.gitignore`,
-docs y hook; para público hay que pasar `public: true` explícitamente.
+`brainsource_new_repo` crea el repo privado por defecto, con una descripción breve
+obligatoria, MIT, `.gitignore`, docs y hook; para público hay que pasar `public: true`
+explícitamente.
 
 ## Migración desde el setup manual
 

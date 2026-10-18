@@ -11,6 +11,7 @@ const COMMANDS: CommandSpec[] = [
     template: [
       "Usá el tool `brainsource_new_repo` para crear el repositorio indicado abajo.",
       "Reglas: privado por defecto; público solo si el usuario lo pidió explícitamente; licencia MIT.",
+      "La descripción breve del About es obligatoria: si el usuario no la dio, proponé una (<=160 chars) y confirmala.",
       "Primero llamá al tool con `apply: false` (dry-run), mostrá el plan y esperá confirmación.",
       "Después llamá con `apply: true`. No crees el repo remoto ni hagas push sin aprobación explícita.",
     ].join("\n"),
@@ -50,6 +51,15 @@ const COMMANDS: CommandSpec[] = [
       "Usá el tool `brainsource_install_commit_hook` en el repo actual.",
       "Si ya existe un hook distinto, mostralo y pedí confirmación antes de reemplazarlo (`force: true`).",
       "Si `core.hooksPath` está configurado, advertí que Git ignora `.git/hooks`.",
+    ].join("\n"),
+  },
+  {
+    name: "repo-about",
+    description: "Crear/actualizar la descripción del About del repo en GitHub",
+    template: [
+      "Usá el tool `brainsource_set_repo_about` para actualizar el About del repo actual.",
+      "Si no tenés una descripción, leé el README y proponé una breve (<=160 chars) antes de aplicar.",
+      "Incluí topics relevantes si faltan.",
     ].join("\n"),
   },
 ]

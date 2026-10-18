@@ -11,6 +11,8 @@ GitHub) con los defaults de Brainsource.
 ## Defaults
 
 - **Privado** salvo pedido explícito de público.
+- **Descripción breve obligatoria** en el About de GitHub (≤160 chars). Si no la da el
+  usuario, proponela a partir del propósito/README y confirmala.
 - **MIT** salvo que se indique otra licencia (`license: "none"` para ninguna).
 - `.gitignore` completo: Node/npm/pnpm/bun, Python, artefactos, secretos, OS/editor.
 - Scaffolding: `README.md`, `AGENTS.md`, `ARCHITECTURE.md`, `docs/README.md`.
@@ -20,7 +22,7 @@ GitHub) con los defaults de Brainsource.
 
 ## Flujo
 
-1. Confirmar **nombre**, visibilidad, descripción y owner (personal u org).
+1. Confirmar **nombre**, **descripción**, visibilidad y owner (personal u org).
 2. Llamar al tool `brainsource_new_repo` en **dry-run** (`apply: false`) y mostrar
    el plan.
 3. Pedir aprobación.
@@ -35,7 +37,7 @@ GitHub) con los defaults de Brainsource.
 |---|---|---|---|
 | `name` | string | — | Nombre del repo (kebab-case) |
 | `public` | boolean | `false` | Crea el repo público (opt-in explícito) |
-| `description` | string | `name` | Descripción del repo |
+| `description` | string | — (obligatoria) | Descripción breve del About (≤160 chars) |
 | `owner` | string | cuenta autenticada | Owner personal u org |
 | `dir` | string | `<workspace>/<name>` | Directorio destino |
 | `license` | `MIT` \| `none` | `MIT` | Licencia |
@@ -48,3 +50,9 @@ GitHub) con los defaults de Brainsource.
 - `gh auth status` antes de crear el remoto.
 - No crear repos públicos por accidente: la visibilidad siempre es explícita.
 - No agregar credenciales a los templates ni al repo.
+
+## About en repos existentes
+
+Si el repo ya existe y no tiene descripción (o quedó vieja), usá
+`brainsource_set_repo_about` con una descripción breve y los topics relevantes. No
+esperes a que el usuario lo pida.
